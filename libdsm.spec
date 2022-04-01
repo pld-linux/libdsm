@@ -6,20 +6,24 @@
 Summary:	Minimalist and read-only SMB client library
 Summary(pl.UTF-8):	Minimalistyczna biblioteka klienta SMB (tylko do odczytu)
 Name:		libdsm
-Version:	0.3.2
+Version:	0.4.0
 Release:	1
 License:	LGPL v2.1+ or commercial
 Group:		Libraries
 #Source0Download: https://github.com/videolabs/libdsm/releases
-Source0:	https://github.com/videolabs/libdsm/releases/download/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	f369fed56ec61f08951363157b45c276
+Source0:	https://github.com/videolabs/libdsm/releases/download/v%{version}/%{name}-%{version}.tar.xz
+# Source0-md5:	6013fe1a64bca8268e197817c8645588
+Patch0:		%{name}-meson.patch
 URL:		https://videolabs.github.io/libdsm/
-#BuildRequires:	autoconf >= 2.53
-#BuildRequires:	automake >= 1:1.6
 %{?with_apidocs:BuildRequires:	doxygen}
 BuildRequires:	libbsd-devel
 BuildRequires:	libtasn1-devel >= 3.0
-#BuildRequires:	libtool >= 2:2
+BuildRequires:	meson >= 0.53.0
+BuildRequires:	ninja >= 1.5
+BuildRequires:	rpm-build >= 4.6
+BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	tar >= 1:1.22
+BuildRequires:	xz
 Requires:	libtasn1 >= 3.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -63,6 +67,7 @@ Statyczna biblioteka liBDSM.
 Summary:	API documentation for liBDSM library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki liBDSM
 Group:		Documentation
+BuildArch:	noarch
 
 %description apidocs
 API documentation for liBDSM library.
@@ -72,27 +77,23 @@ Dokumentacja API biblioteki liBDSM.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %{__sed} -ne '1,/^===/ p' COPYING > LICENSE
 
 %build
-%configure \
-	--disable-silent-rules \
-	%{!?with_static_libs:--disable-static}
-%{__make}
+%meson build \
+	%{!?with_static_libs:--default-library=shared}
 
-%if %{with apidocs}
-%{__make} doc
-%endif
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build
 
-# obsoleted by pkgconfig
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libdsm.la
+# packaged as %doc
+rm -rf $RPM_BUILD_ROOT%{_docdir}/libdsm
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -125,5 +126,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%doc doc/html/*
+%doc build/html/*
 %endif
