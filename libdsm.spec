@@ -6,13 +6,13 @@
 Summary:	Minimalist and read-only SMB client library
 Summary(pl.UTF-8):	Minimalistyczna biblioteka klienta SMB (tylko do odczytu)
 Name:		libdsm
-Version:	0.4.0
+Version:	0.4.3
 Release:	1
 License:	LGPL v2.1+ or commercial
 Group:		Libraries
 #Source0Download: https://github.com/videolabs/libdsm/releases
 Source0:	https://github.com/videolabs/libdsm/releases/download/v%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	6013fe1a64bca8268e197817c8645588
+# Source0-md5:	e39e2dafbfd3ee5ee07c21d8cf1fb8f1
 Patch0:		%{name}-meson.patch
 URL:		https://videolabs.github.io/libdsm/
 %{?with_apidocs:BuildRequires:	doxygen}
@@ -126,5 +126,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%doc build/html/*
+%doc build/doc/html/*
 %endif
