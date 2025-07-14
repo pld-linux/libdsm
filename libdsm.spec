@@ -77,7 +77,7 @@ Dokumentacja API biblioteki liBDSM.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch -P0 -p1
 
 %{__sed} -ne '1,/^===/ p' COPYING > LICENSE
 
